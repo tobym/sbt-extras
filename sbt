@@ -329,6 +329,7 @@ process_args ()
      -debug-inc) addJava "-Dxsbt.inc.debug=true" && shift ;;
        -offline) addSbt "set offline := true" && shift ;;
      -jvm-debug) require_arg port "$1" "$2" && addDebugger $2 && shift 2 ;;
+        -jrebel) addJava "-noverify -javaagent:/Applications/ZeroTurnaround/JRebel/jrebel.jar" && shift ;;
          -batch) exec </dev/null && shift ;;
 
     -sbt-create) sbt_create=true && shift ;;
