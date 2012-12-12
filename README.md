@@ -6,6 +6,15 @@ It works with sbt 0.7.x projects as well as 0.10+. If you're in an sbt
 project directory, the runner will figure out the versions of sbt and
 scala required by the project and download them if necessary.
 
+## Installation
+To install, the "sbt" bash script at the root of the project needs to be placed on your path.
+
+    curl https://raw.github.com/paulp/sbt-extras/master/sbt > ~/bin/sbt
+
+It is a good idea to uninstall any pre-existing sbt installations you may have.
+
+## Sample usage
+
 Sample usage: create a new project using a snapshot version of sbt as
 well as a snapshot version of scala, then run the sbt "about" command.
 
@@ -37,6 +46,14 @@ well as a snapshot version of scala, then run the sbt "about" command.
     [info] The current project is built against Scala 2.10.0-SNAPSHOT
     [info] sbt, sbt plugins, and build definitions are using Scala 2.9.1
 
+Sample, contrived usage of `prompt` option, using both `e` and `s`:
+
+    % sbt -prompt 'e.evalTask(Keys.scalacOptions, s) + "> "'
+    [info] <snip>
+    List(-deprecation)> set scalacOptions += "-Xlint"
+    [info] <snip>
+    List(-deprecation, -Xlint)>
+
 Current -help output:
 
     Usage: sbt [options]
@@ -45,31 +62,36 @@ Current -help output:
       -v | -verbose      this runner is chattier
       -d | -debug        set sbt log level to Debug
       -q | -quiet        set sbt log level to Error
+      -trace <level>     display stack traces with a max of <level> frames (default: 15)
       -no-colors         disable ANSI color codes
       -sbt-create        start sbt even if current directory contains no sbt project
       -sbt-dir   <path>  path to global settings/plugins directory (default: ~/.sbt/<version>)
-      -sbt-boot  <path>  path to shared boot directory (default: ~/.sbt/boot in 0.11 series)
+      -sbt-boot  <path>  path to shared boot directory (default: ~/.sbt/boot in 0.11+)
       -ivy       <path>  path to local Ivy repository (default: ~/.ivy2)
-      -mem    <integer>  set memory options (default: 1536, which is -Xms1536m -Xmx1536m -XX:MaxPermSize=384m -XX:ReservedCodeCacheSize=192m)
+      -mem    <integer>  set memory options (default: 1536, which is
+                           -Xms1536m -Xmx1536m -XX:MaxPermSize=384m -XX:ReservedCodeCacheSize=192m )
       -no-share          use all local caches; no sharing
       -offline           put sbt in offline mode
       -jvm-debug <port>  Turn on JVM debugging, open at the given port.
       -batch             Disable interactive mode
+      -prompt <expr>     Set the sbt prompt; in expr, 's' is the State and 'e' is Extracted
 
       # sbt version (default: from project/build.properties if present, else latest release)
+      !!! The only way to accomplish this pre-0.12.0 if there is a build.properties file which
+      !!! contains an sbt.version property is to update the file on disk.  That's what this does.
       -sbt-version  <version>   use the specified version of sbt
       -sbt-jar      <path>      use the specified jar as the sbt launcher
-      -sbt-rc                   use an RC version of sbt
       -sbt-snapshot             use a snapshot version of sbt
+      -sbt-launch-dir <path>    directory to hold sbt launchers (default: ./.lib)
 
-      # scala version (default: latest release)
+      # scala version (default: as chosen by sbt)
       -28                       use 2.8.2
-      -29                       use 2.9.1
-      -210                      use 2.10.0-SNAPSHOT
+      -29                       use 2.9.2
+      -210                      use 2.10.0-RC2
       -scala-home <path>        use the scala build at the specified directory
       -scala-version <version>  use the specified version of scala
 
-      # java version (default: java from PATH, currently java version "1.6.0_29")
+      # java version (default: java from PATH, currently java version "1.7.0_06")
       -java-home <path>         alternate JAVA_HOME
 
       # jvm options and output control
@@ -79,7 +101,7 @@ Current -help output:
       .sbtopts      if file is in sbt root, it is prepended to the args given to **sbt**
       -Dkey=val     pass -Dkey=val directly to the jvm
       -J-X          pass option -X directly to the jvm (-J is stripped)
-      -S-X          add -X to sbt's scalacOptions (-J is stripped)
+      -S-X          add -X to sbt's scalacOptions (-S is stripped)
 
     In the case of duplicated or conflicting options, the order above
     shows precedence: JAVA_OPTS lowest, command line options highest.
@@ -89,7 +111,7 @@ Current -help output:
 To see the plugin in action, including the thrilling custom sbt command "help-names":
 
     cd template-project && ../sbt -sbt-rc help-names zomg zomg2
-    
+
 The template files are:
 
     project/plugins/project/Build.scala   # you can use this as-is if you want
